@@ -18,9 +18,9 @@
       git checkout develop
       git pull origin develop
       ```
-    * Для новой функциональности используйте префикс `feature/`:  
-      `git checkout -b feature/название-задачи`
-    * Для исправления багов используйте префикс `bugfix/`:  
-      `git checkout -b bugfix/описание-бага`
+    * Для новой функциональности используйте префикс `feat/`:  
+      `git checkout -b feat/название-задачи`
+    * Для исправления багов используйте префикс `fix/`:  
+      `git checkout -b fix/описание-бага`
 
 ---
