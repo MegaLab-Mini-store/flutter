@@ -36,6 +36,12 @@ linter:
     unawaited_futures: true
     unnecessary_parenthesis: true
 
+    # const там, где он возможен: const-виджет не пересоздаётся при rebuild,
+    # а забытый const в списке товаров стоит работы на каждом кадре скролла.
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+
     # Защита от ошибок в денежных и асинхронных расчётах
     avoid_double_and_int_checks: true
     no_adjacent_strings_in_list: true
