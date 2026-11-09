@@ -1,0 +1,13 @@
+# Dart-код и конфиги - всегда LF, чтобы `dart format` в CI на Linux
+# не падал из-за CRLF, добавленных Windows.
+*.dart text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# Gradle wrapper
+gradlew text eol=lf
+*.bat text eol=crlf
