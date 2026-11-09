@@ -46,3 +46,14 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+
+#docs
+/docs/
+
+# Сгенерированный build_runner код: freezed, json_serializable,
+# riverpod_generator. В репозитории не держим — генерируется локально
+# и в CI командой `dart run build_runner build --delete-conflicting-outputs`.
+# После checkout новой ветки и после pull генерацию надо прогнать заново.
+*.g.dart
+*.freezed.dart
