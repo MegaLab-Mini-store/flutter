@@ -3,11 +3,16 @@ name: Flutter CI
 on:
   push:
     branches: [main, develop]
+    tags: ['v*']
   pull_request:
     branches: [main, develop]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,11 +36,62 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      # Ген-код в репозитории не хранится, поэтому CI обязан его создать
+      # до анализа и тестов — иначе они не увидят part-файлы.
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Run Analyze (Lint)
-        run: flutter analyze
+        run: flutter analyze --fatal-infos
 
       - name: Run Tests
         run: flutter test
 
-      - name: Build APK (Check compilation)
+  # Сборка APK — только по тегу вида v1.0.0. Не каждый PR
+  build-apk:
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.9'
+          channel: 'stable'
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # TODO: заменить на --release, когда появится keystore.
+      - name: Build APK
         run: flutter build apk --debug
+
+      - name: Rename APK by tag
+        run: |
+          mv build/app/outputs/flutter-apk/app-debug.apk \
+             build/app/outputs/flutter-apk/ministore-${{ github.ref_name }}.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ministore-${{ github.ref_name }}
+          path: build/app/outputs/flutter-apk/ministore-${{ github.ref_name }}.apk
+          retention-days: 90
